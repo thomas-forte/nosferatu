@@ -1,0 +1,14 @@
+#Example Service File
+[Unit]
+Description=Gunicorn instance to serve garage pi
+After=network.target
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/home/pi/garage_pi
+Environment="PATH=/home/pi/garage_pi/venv/bin"
+ExecStart=/home/pi/garage_pi/venv/bin/gunicorn --workers 1 --bind unix:garage_pi.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
