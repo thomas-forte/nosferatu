@@ -1,4 +1,4 @@
-#Garage Pi
+# Garage Pi
 
 ### Hardware
 - Raspberry Pi W
