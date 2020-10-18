@@ -1,0 +1,10 @@
+{
+    "title": "Garage Pi",
+    "subtitle": "Below are two buttons that will cycle their named relays.",
+    "icon": "fas fa-warehouse",
+
+    "gpios": [
+        { "pin": 2, "key": "k1", "name": "K1", "wait": 1 },
+        { "pin": 3, "key": "k2", "name": "K2", "wait": 1 }
+    ]
+}

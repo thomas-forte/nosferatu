@@ -25,5 +25,4 @@
 - Serve up WSGI flask app
 
 ### Future Features
-- Make dynamic config
 - Music control for garage?

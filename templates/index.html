@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block page %}
 <div class="container">
     <div class="py-5 text-center">
-        <i class="fas fa-warehouse fa-5x"></i>
-        <h2>Garage Pi</h2>
-        <p class="lead">Below are two buttons that will cycle their named relays.</p>
+        <i class="{{ icon }} fa-5x"></i>
+        <h2>{{ title }}</h2>
+        <p class="lead">{{ subtitle }}</p>
     </div>
 
     <div class="py-5 row">
+        {% for pin in pins %}
         <div class="col-6">
-            <button id="k1-button" class="btn btn-primary btn-block" type="button">K1</button>
+            <button id="{{ pin.key }}-button" class="btn btn-primary btn-block" type="button">{{ pin.name }}</button>
         </div>
-        <div class="col-6">
-            <button id="k2-button" class="btn btn-primary btn-block" type="button">K2</button>
-        </div>
+        {% endfor %}
     </div>
 
     <div class="py-5 row">
@@ -35,27 +36,18 @@
 {% block scripts %}
 <script>
     $(function() { 
-        $('#k1-button').click(function(e) {
+        {% for pin in pins %}
+        $('#{{ pin.key }}-button').click(function(e) {
             e.preventDefault();
-            $.get( "k1", function() {
-                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K1 cycled sucessfully!</div>");
+            $.get( "/gpio/{{ pin.pin }}", function() {
+                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycled sucessfully!</div>");
                 return true;
             }).fail(function() {
-                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K1 cycle failed!</div>");
+                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycle failed!</div>");
                 return false;
             });
         });
-
-        $('#k2-button').click(function(e) {
-            e.preventDefault();
-            $.get( "k1", function() {
-                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K2 cycled successfully!</div>");
-                return true;
-            }).fail(function() {
-                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K2 cycle failed!</div>");
-                return false;
-            });
-        });
+        {% endfor %}
     });
 </script>
 {% endblock %}
