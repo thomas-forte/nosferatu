@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block page %}
+<div class="container">
+    <div class="py-5 text-center">
+        <i class="fas fa-warehouse fa-5x"></i>
+        <h2>Garage Pi</h2>
+        <p class="lead">Below are two buttons that will cycle their named relays.</p>
+    </div>
+
+    <div class="py-5 row">
+        <div class="col-6">
+            <button id="k1-button" class="btn btn-primary btn-block" type="button">K1</button>
+        </div>
+        <div class="col-6">
+            <button id="k2-button" class="btn btn-primary btn-block" type="button">K2</button>
+        </div>
+    </div>
+
+    <div class="py-5 row">
+        <div id="alerts" class="col"></div>
+    </div>
+
+    <footer class="my-5 pt-3 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2020 Tommy's Garage</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="/">Home</a></li>
+            <li class="list-inline-item"><a href="/privacy">Privacy</a></li>
+            <li class="list-inline-item"><a href="mailto:tjf3191@gmail.com">Support</a></li>
+        </ul>
+    </footer>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function() { 
+        $('#k1-button').click(function(e) {
+            e.preventDefault();
+            $.get( "k1", function() {
+                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K1 cycled sucessfully!</div>");
+                return true;
+            }).fail(function() {
+                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K1 cycle failed!</div>");
+                return false;
+            });
+        });
+
+        $('#k2-button').click(function(e) {
+            e.preventDefault();
+            $.get( "k1", function() {
+                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K2 cycled successfully!</div>");
+                return true;
+            }).fail(function() {
+                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>K2 cycle failed!</div>");
+                return false;
+            });
+        });
+    });
+</script>
+{% endblock %}
