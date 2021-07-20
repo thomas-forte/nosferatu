@@ -75,6 +75,7 @@
 - Restart nginx
   - `sudo systemctl restart nginx`
 
-### Future Features
+### Setup Notes
 
-- Music control for garage?
+- assumes user is pi
+- assumes code is checked out into user's root home directory
