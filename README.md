@@ -21,7 +21,7 @@
 - Relay 1 to GPIO 2
 - Relay 2 to GPIO 3
 - Pinout
-  - ![image of pi zero pins](docs/raspberry pi gpio.png?raw=true)
+  - ![image of pi zero pins](https://github.com/thomas-forte/nosferatu/blob/master/docs/raspberry%20pi%20gpio.png?raw=true)
   - please reference the command `pinout` to ensure your pi's pins
 
 - Add service
