@@ -24,7 +24,7 @@ def index():
 
 @app.route('/privacy', methods=['GET'])
 def privacy():
-    return render_template('privacy.html')
+    return render_template('privacy.html', title=config['title'], subtitle='Privacy', icon=config['icon'])
 
 @app.route('/gpio/<int:pin>', methods=['GET'])
 def gpio_toggle(pin):
