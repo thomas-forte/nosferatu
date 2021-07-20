@@ -40,10 +40,8 @@
   - `sudo apt update`
 - install those updates
   - `sudo apt upgrade`
-- install git, pip3, nginx
-  - `sudo apt install git python3-pip nginx`
-- adjust system path by appending the following to ".bashrc"
-  - `PATH=/home/pi/.local/bin:$PATH`
+- install git, pip3, venv3, nginx
+  - `sudo apt install git python3-pip python3-venv nginx`
 - reboot
   - `sudo reboot`
 
@@ -53,10 +51,12 @@
   - `git clone https://github.com/thomas-forte/garage-pi.git`
 - cd into repo
   - `cd garage-pi`
+- create environment
+  - `python3 -m venv venv`
+- add environment to path
+  - `source venv/bin/activate`
 - install python dependencies
-  - `pip3 install -r requirements.txt`
-- copy nginx.config to
-- enable nginx as a startup Service
+  - `pip install -r requirements.txt`
 
 ### Service setup
 
@@ -64,11 +64,14 @@
   - `sudo cp nosferatu.service /etc/systemd/system/nosferatu.service`
 - Start Gunicorn service
   - `sudo systemctl start nosferatu`
+- Make Gunicorn service start on boot
+  - `sudo systemctl enable nosferatu.service`
 - Setup nginx config
   - `sudo cp nosferatu.nginx /etc/nginx/sites-available/nosferatu`
   - `sudo ln -s /etc/nginx/sites-available/nosferatu /etc/nginx/sites-enabled`
 - Test nginx config
   - `sudo nginx -t`
+  - If there is a port 80 duplicate error you must remove the example default site from sites-enabled
 - Restart nginx
   - `sudo systemctl restart nginx`
 
