@@ -2,6 +2,7 @@ click==8.0.1
 colorzero==1.1
 Flask==2.0.1
 gpiozero==1.6.2
+gunicorn==19.10.0
 itsdangerous==2.0.1
 Jinja2==3.0.1
 MarkupSafe==2.0.1
