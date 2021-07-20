@@ -1,4 +1,4 @@
-from garage_pi import app
+from nosferatu import app
 
 if __name__ == "__main__":
     app.run()

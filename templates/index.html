@@ -1,53 +1,36 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block page %}
-<div class="container">
-    <div class="py-5 text-center">
-        <i class="{{ icon }} fa-5x"></i>
-        <h2>{{ title }}</h2>
-        <p class="lead">{{ subtitle }}</p>
-    </div>
+  <div class="py-5 row">
+    {% for pin in pins %}
+      <div class="col-6">
+        <button id="{{ pin.key }}-button" class="btn btn-primary btn-block" type="button">{{ pin.name }}</button>
+      </div>
+    {% endfor %}
+  </div>
 
-    <div class="py-5 row">
-        {% for pin in pins %}
-        <div class="col-6">
-            <button id="{{ pin.key }}-button" class="btn btn-primary btn-block" type="button">{{ pin.name }}</button>
-        </div>
-        {% endfor %}
-    </div>
-
-    <div class="py-5 row">
-        <div id="alerts" class="col"></div>
-    </div>
-
-    <footer class="my-5 pt-3 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2020 Tommy's Garage</p>
-        <ul class="list-inline">
-            <li class="list-inline-item"><a href="/">Home</a></li>
-            <li class="list-inline-item"><a href="/privacy">Privacy</a></li>
-            <li class="list-inline-item"><a href="mailto:tjf3191@gmail.com">Support</a></li>
-        </ul>
-    </footer>
-</div>
+  <div class="py-5 row">
+    <div id="alerts" class="col"></div>
+  </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
+{% block scripts %}  
+  <script type="text/javascript">
     $(function() { 
-        {% for pin in pins %}
+      {% for pin in pins %}
         $('#{{ pin.key }}-button').click(function(e) {
-            e.preventDefault();
-            $.get( "/gpio/{{ pin.pin }}", function() {
-                $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycled sucessfully!</div>");
-                return true;
-            }).fail(function() {
-                $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycle failed!</div>");
-                return false;
-            });
+          e.preventDefault();
+          $.get( "/gpio/{{ pin.pin }}", function() {
+            $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycled sucessfully!</div>");
+            return true;
+          }).fail(function() {
+            $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycle failed!</div>");
+            return false;
+          });
         });
-        {% endfor %}
+      {% endfor %}
     });
-</script>
+  </script>
 {% endblock %}
