@@ -38,4 +38,4 @@ def gpio_toggle(pin):
     return 'success'
 
 if __name__ == "__main__":
-    application.run(host='0.0.0.0')
+    app.run(host='0.0.0.0')

@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve nosferatu
+After=network.target
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/home/pi/nosferatu
+Environment="PATH=/home/pi/nosferatu/venv/bin"
+ExecStart=/home/pi/nosferatu/venv/bin/gunicorn --workers 1 --bind unix:nosferatu.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
