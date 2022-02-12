@@ -67,8 +67,9 @@
 - Make Gunicorn service start on boot
   - `sudo systemctl enable nosferatu.service`
 - Setup nginx config
-  - `sudo cp nosferatu.nginx /etc/nginx/sites-available/nosferatu`
+  - `sudo cp nginx.conf /etc/nginx/sites-available/nosferatu`
   - `sudo ln -s /etc/nginx/sites-available/nosferatu /etc/nginx/sites-enabled`
+  - `sudo rm /etc/nginx/sites-enabled/default`
 - Test nginx config
   - `sudo nginx -t`
   - If there is a port 80 duplicate error you must remove the example default site from sites-enabled
