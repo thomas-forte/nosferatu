@@ -1,4 +1,4 @@
-# Garage Pi
+# Nosferatu
 
 ## Hardware
 
@@ -48,9 +48,9 @@
 ### Software Setup
 
 - clone repository
-  - `git clone https://github.com/thomas-forte/garage-pi.git`
+  - `git clone https://github.com/thomas-forte/nosferatu.git`
 - cd into repo
-  - `cd garage-pi`
+  - `cd nosferatu`
 - create environment
   - `python3 -m venv venv`
 - add environment to path
