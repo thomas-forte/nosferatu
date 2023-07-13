@@ -3,10 +3,18 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block page %}
-  <div class="py-5 row">
+  <div class="py-3 row justify-content-center">
     {% for pin in pins %}
-      <div class="col-6">
+      <div class="col-12 col-md-6 col-lg-4 col-xl-2 py-1">
         <button id="{{ pin.key }}-button" class="btn btn-primary btn-block" type="button">{{ pin.name }}</button>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="py-3 row justify-content-center">      
+    {% for wemo in wemos %}
+      <div class="col-12 col-md-6 col-lg-4 col-xl-2 py-1">
+        <button id="{{ wemo.key }}-button" class="btn btn-primary btn-block" type="button">{{ wemo.name }}</button>
       </div>
     {% endfor %}
   </div>
@@ -19,14 +27,53 @@
 {% block scripts %}  
   <script type="text/javascript">
     $(function() { 
+      const buildSuccessAlert = (message) => $(
+        '<div class="alert alert-success alert-dismissable fade show">' + 
+          '<button type="button" class="close" data-dismiss="alert">' + 
+            '<span aria-hidden="true">&times;</span>' + 
+          '</button>' + 
+          message + 
+        '</div>'
+      );
+
+      const buildDangerAlert = (message) => $(
+        '<div class="alert alert-danger alert-dismissable fade show">' + 
+          '<button type="button" class="close" data-dismiss="alert">' + 
+            '<span aria-hidden="true">&times;</span>' + 
+          '</button>' + 
+          message + 
+        '</div>'
+      );
+
       {% for pin in pins %}
-        $('#{{ pin.key }}-button').click(function(e) {
+        $("#{{ pin.key }}-button").click(e => {
           e.preventDefault();
-          $.get( "/gpio/{{ pin.pin }}", function() {
-            $("#alerts").append("<div class='alert alert-success alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycled sucessfully!</div>");
+          $.get( "/gpio/{{ pin.pin }}", data => {
+            const $alert = buildSuccessAlert('{{ pin.name }} turned ');
+            $("#alerts").append($alert);
+            setTimeout(() => $alert.alert('close'), 3000);
             return true;
-          }).fail(function() {
-            $("#alerts").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span></button>{{ pin.name }} cycle failed!</div>");
+          }).fail(() => {
+            const $alert = buildDangerAlert('{{ pin.name }} cycle failed!');
+            $("#alerts").append($alert);
+            setTimeout(() => $alert.alert('close'), 3000);
+            return false;
+          });
+        });
+      {% endfor %}
+
+      {% for wemo in wemos %}
+        $("#{{ wemo.key }}-button").click(e => {
+          e.preventDefault();
+          $.get( "/wemo/{{ wemo.key }}", data => {
+            const $alert = buildSuccessAlert('{{ wemo.name }} turned ' + data);
+            $("#alerts").append($alert);
+            setTimeout(() => $alert.alert('close'), 3000);
+            return true;
+          }).fail(() => {
+            const $alert = buildDangerAlert('{{ wemo.name }} cycle failed!');
+            $("#alerts").append($alert);
+            setTimeout(() => $alert.alert('close'), 3000);
             return false;
           });
         });

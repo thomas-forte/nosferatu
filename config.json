@@ -6,5 +6,9 @@
     "gpios": [
         { "pin": 2, "key": "k1", "name": "K1", "wait": 1 },
         { "pin": 3, "key": "k2", "name": "K2", "wait": 1 }
+    ],
+
+    "wemos": [
+        { "ip": "192.168.1.77", "mac": "24:30:a2:55:45:90", "key": "wemo_1", "name": "Living Room" }
     ]
 }
