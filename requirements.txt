@@ -15,6 +15,6 @@ lxml==4.9.3
 MarkupSafe==2.1.3
 pywemo==1.1.0
 requests==2.31.0
-urllib3==2.0.3
+urllib3==2.0.6
 Werkzeug==2.3.6
 zipp==3.16.1
