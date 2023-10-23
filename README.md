@@ -2,7 +2,7 @@
 
 ## Hardware
 
-- Raspberry Pi W
+- Orignally created for the Zero W but will work on 2/3/4/Z/Z2
 - 2 Channel Relay Module
 
 ## Software
@@ -16,7 +16,7 @@
 
 ### Hardware Setup
 
-- 15W+ power supply
+- 15W+ power supply (or even higher with the new boards)
 - Using +5V from board to power Vcc on  RELAY module
 - Relay 1 to GPIO 2
 - Relay 2 to GPIO 3
