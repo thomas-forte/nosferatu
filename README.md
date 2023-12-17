@@ -24,7 +24,7 @@ Everything can be done within the config file.
 ### Hardware
 
 - Originally created for the Zero W but will work on anything supported by gpiozero
-- 2 Channel Relay Module [example](https://github.com/thomas-forte/nosferatu/blob/master/docs/relay%20module.png?raw=true)
+- 2 Channel Relay Module [example](https://github.com/thomas-forte/nosferatu/blob/master/docs/relay%20module.jpg?raw=true)
 
 ### Setup
 
