@@ -1,51 +1,53 @@
 # Nosferatu
 
-## Hardware
+This project started as a way to control a relay channel but has grown to more than that.
 
-- Orignally created for the Zero W but will work on 2/3/4/Z/Z2
-- 2 Channel Relay Module
+## Configuration
 
-## Software
+Everything can be done within the config file.
 
-- Raspberry Pi OS Lite
-- git
-- Python 3
-- nginx
+## Docker Setup
 
-## Setup
+*Note: GPIO functions won't work this way.*
 
-### Hardware Setup
+### Service Setup
 
-- 15W+ power supply (or even higher with the new boards)
-- Using +5V from board to power Vcc on  RELAY module
+- clone repository
+  - `git clone https://github.com/thomas-forte/nosferatu.git`
+- cd into repo
+  - `cd nosferatu`
+- create docker service
+  - `docker compose up -d`
+
+## Standalone Pi Setup
+
+### Hardware
+
+- Originally created for the Zero W but will work on anything supported by gpiozero
+- 2 Channel Relay Module [example](https://github.com/thomas-forte/nosferatu/blob/master/docs/relay%20module.png?raw=true)
+
+### Setup
+
+#### Hardware Setup
+
+- Raspberry Pi
+- Power supply (or even higher with the new boards)
+- Using +5V from board to power Vcc on RELAY module
 - Relay 1 to GPIO 2
 - Relay 2 to GPIO 3
-- Pinout
-  - ![image of pi zero pins](https://github.com/thomas-forte/nosferatu/blob/master/docs/raspberry%20pi%20gpio.png?raw=true)
-  - please reference the command `pinout` to ensure your pi's pins
 
-- Add service
-- Setup nginx proxy
-- Serve up WSGI flask app
+#### Operating System Setup
 
-### Operating System Setup
-
-- install Raspberry Pi OS Lite to an sd card using Raspberry Pi Imager
-- copy the file named "ssh" from "boot" to the boot partition
-- copy the file named "wpa_supplicant.conf" from "boot" to the boot partition
-  - open the file and update the two fields to match you wifi settings
-- once booted ssh into the pi
-  - `ssh pi@<pi's ip address on your network>`
-- check for updates to the os and included libraries
+- Install Raspberry Pi OS Lite
+- Fully update the OS
   - `sudo apt update`
-- install those updates
   - `sudo apt upgrade`
-- install git, pip3, venv3, nginx
+  - `sudo apt autoremove`
+- Install dependencies
   - `sudo apt install git python3-pip python3-venv nginx`
-- reboot
-  - `sudo reboot`
+- Reboot
 
-### Software Setup
+#### Software Setup
 
 - clone repository
   - `git clone https://github.com/thomas-forte/nosferatu.git`
@@ -58,13 +60,13 @@
 - install python dependencies
   - `pip install -r requirements.txt`
 
-### Service setup
+#### Service setup
 
 - Setup service config file
   - `sudo cp nosferatu.service /etc/systemd/system/nosferatu.service`
-- Start Gunicorn service
+- Start the service
   - `sudo systemctl start nosferatu`
-- Make Gunicorn service start on boot
+- Make the service start on boot
   - `sudo systemctl enable nosferatu.service`
 - Setup nginx config
   - `sudo cp nginx.conf /etc/nginx/sites-available/nosferatu`
@@ -76,7 +78,8 @@
 - Restart nginx
   - `sudo systemctl restart nginx`
 
-### Setup Notes
+#### GPIO Reference
 
-- assumes user is pi
-- assumes code is checked out into user's root home directory
+*Please reference the command `pinout` to ensure your pi's pins*
+
+![image of pi zero pins](https://github.com/thomas-forte/nosferatu/blob/master/docs/raspberry%20pi%20gpio.png?raw=true)

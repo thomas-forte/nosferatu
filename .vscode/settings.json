@@ -1,4 +1,7 @@
 {
+    "editor.formatOnSave": true,
+    "html.format.wrapAttributes": "force-expand-multiline",
+    "html.format.templating": true,
     "cSpell.words": [
         "gpiozero",
         "pywemo",
