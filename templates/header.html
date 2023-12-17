@@ -1,5 +1,13 @@
-<div class="py-5 text-center">
-    <i class="{{ icon }} fa-5x"></i>
-    <h2>{{ title }}</h2>
-    <p class="lead">{{ subtitle }}</p>
+<div class="px-4 py-5 my-md-5 text-center">
+    {% if pageIcon %}
+    <i class="{{ pageIcon }} fs-1 mb-3"></i>
+    {% endif %}
+
+    <h1 class="display-5 fw-bold text-body-emphasis">{{ pageTitle or "Nosferatu" }}</h1>
+
+    {% if pageSubtitle %}
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">{{ pageSubtitle }}</p>
+    </div>
+    {% endif %}
 </div>

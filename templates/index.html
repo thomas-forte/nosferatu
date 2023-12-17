@@ -1,83 +1,84 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
 
-{% block page %}
-  <div class="py-3 row justify-content-center">
-    {% for pin in pins %}
-      <div class="col-12 col-md-6 col-lg-4 col-xl-2 py-1">
-        <button id="{{ pin.key }}-button" class="btn btn-primary btn-block" type="button">{{ pin.name }}</button>
-      </div>
-    {% endfor %}
-  </div>
+{%block page %}
+<div class="container d-flex flex-wrap justify-content-center">
+  {% for wemo in wemos %}
+  <button
+    id="wemo-{{ wemo.key }}-button"
+    class="btn btn-primary btn-block btn-lg px-4 m-3"
+    type="button"
+    style="min-width: 180px;"
+    data-key="{{ wemo.key }}"
+    data-name="{{ wemo.name }}"
+  >
+    {{ wemo.name }}
+  </button>
+  {% else %}
+  <p>See the <a href="https://github.com/thomas-forte/nosferatu/blob/master/README.md">README</a> for project config</p>
+  {% endfor %}
+</div>
 
-  <div class="py-3 row justify-content-center">      
-    {% for wemo in wemos %}
-      <div class="col-12 col-md-6 col-lg-4 col-xl-2 py-1">
-        <button id="{{ wemo.key }}-button" class="btn btn-primary btn-block" type="button">{{ wemo.name }}</button>
-      </div>
-    {% endfor %}
-  </div>
+<div class="container d-flex flex-wrap justify-content-center">
+  {% for pin in pins %}
+  <button
+    id="pin-{{ pin.key }}-button"
+    class="btn btn-secondary btn-block btn-lg px-4 m-3"
+    type="button"
+    style="min-width: 180px;"
+    data-key="{{ pin.pin }}"
+    data-name="{{ pin.name }}"
+  >
+    {{ pin.name }}
+  </button>
+  {% else %}
+  <p>See the <a href="https://github.com/thomas-forte/nosferatu/blob/master/README.md">README</a> for project config</p>
+  {% endfor %}
+</div>
 
-  <div class="py-5 row">
-    <div id="alerts" class="col"></div>
-  </div>
+<div
+  id="alerts"
+  class="fixed-top w-100 px-5 mt-5"
+>
+</div>
 {% endblock %}
 
-{% block scripts %}  
-  <script type="text/javascript">
-    $(function() { 
-      const buildSuccessAlert = (message) => $(
-        '<div class="alert alert-success alert-dismissable fade show">' + 
-          '<button type="button" class="close" data-dismiss="alert">' + 
-            '<span aria-hidden="true">&times;</span>' + 
-          '</button>' + 
-          message + 
-        '</div>'
-      );
+{% block pageScripts %}
+<script type="text/javascript">
+  const alertContainer = document.getElementById('alerts');
 
-      const buildDangerAlert = (message) => $(
-        '<div class="alert alert-danger alert-dismissable fade show">' + 
-          '<button type="button" class="close" data-dismiss="alert">' + 
-            '<span aria-hidden="true">&times;</span>' + 
-          '</button>' + 
-          message + 
-        '</div>'
-      );
+  const addAlert = (message, style = "success") => {
+    const alertWrapper = document.createElement("div");
+    alertWrapper.innerHTML = [
+      `<div class="alert alert-${style} alert-dismissible d-flex align-items-center" role="alert">`,
+      `   <i class="${style === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'} me-2"></i>`,
+      `   <div>${message}</div>`,
+      '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+      '</div>'
+    ].join('');
+    alertContainer.append(alertWrapper);
+    setTimeout(() => new bootstrap.Alert(alertWrapper.firstChild).close(), 3500)
+  }
 
-      {% for pin in pins %}
-        $("#{{ pin.key }}-button").click(e => {
-          e.preventDefault();
-          $.get( "/gpio/{{ pin.pin }}", data => {
-            const $alert = buildSuccessAlert('{{ pin.name }} turned ');
-            $("#alerts").append($alert);
-            setTimeout(() => $alert.alert('close'), 3000);
-            return true;
-          }).fail(() => {
-            const $alert = buildDangerAlert('{{ pin.name }} cycle failed!');
-            $("#alerts").append($alert);
-            setTimeout(() => $alert.alert('close'), 3000);
-            return false;
-          });
-        });
-      {% endfor %}
+  const buttons = document.getElementsByTagName('button')
 
-      {% for wemo in wemos %}
-        $("#{{ wemo.key }}-button").click(e => {
-          e.preventDefault();
-          $.get( "/wemo/{{ wemo.key }}", data => {
-            const $alert = buildSuccessAlert('{{ wemo.name }} turned ' + data);
-            $("#alerts").append($alert);
-            setTimeout(() => $alert.alert('close'), 3000);
-            return true;
-          }).fail(() => {
-            const $alert = buildDangerAlert('{{ wemo.name }} cycle failed!');
-            $("#alerts").append($alert);
-            setTimeout(() => $alert.alert('close'), 3000);
-            return false;
-          });
-        });
-      {% endfor %}
+  for (const button of buttons) {
+    button.addEventListener('click', async e => {
+      e.preventDefault();
+      if (button.id.includes('wemo')) {
+        await fetch(`/wemo/${button.dataset.key}`)
+          .then(response => response.text())
+          .then(text => addAlert(`${button.dataset.name} turned ${text}`))
+          .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
+      } else {
+        await fetch(`/gpio/${button.dataset.key}`)
+          .then(response => response.text())
+          .then(text => addAlert(`${button.dataset.name} turned ${text}`))
+          .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
+      }
+      e.target.blur();
     });
-  </script>
+  }
+</script>
 {% endblock %}

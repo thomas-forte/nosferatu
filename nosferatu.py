@@ -35,9 +35,9 @@ def index():
     """
     return render_template(
         'index.html',
-        title=config['title'],
-        subtitle=config['subtitle'],
-        icon=config['icon'],
+        pageTitle=config['title'],
+        pageSubtitle=config['subtitle'],
+        pageIcon=config['icon'],
         pins=pins,
         wemos=wemos)
 
@@ -49,9 +49,9 @@ def privacy():
     """
     return render_template(
         'privacy.html',
-        title=config['title'],
-        subtitle='Privacy',
-        icon=config['icon'])
+        pageTitle=config['title'],
+        pageSubtitle='Privacy',
+        pageIcon=config['icon'])
 
 
 @app.route('/gpio/<int:pin>', methods=['GET'])
