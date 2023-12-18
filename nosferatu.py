@@ -1,5 +1,9 @@
+from datetime import datetime, timedelta
 from time import sleep
-from flask import Flask, render_template
+from uuid import uuid4
+
+from flask import Flask, render_template, request
+from flask_apscheduler import APScheduler
 from gpiozero import LED, GPIOZeroError, Device
 import pywemo
 
@@ -8,6 +12,9 @@ from button import Buttons
 
 app = Flask(__name__)
 buttons = Buttons()
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 
 # setup wemo buttons
 for wemo_config in CONFIG.get("wemos", []):
@@ -55,29 +62,51 @@ def toggle(key):
     """
     "Ajax"
     """
+    toggle_mode = request.args.get("mode", default="toggle")
+    delay = request.args.get("delay", type=int)
     button = buttons.get(key)
-    if button:
-        if button.mode == "wemo":
-            try:
-                url = pywemo.setup_url_for_address(button.address)
-                device = pywemo.device_from_description(url)
+    if not button:
+        return "key was not found", 404
+
+    if delay:
+        scheduler.add_job(
+            str(uuid4()),
+            lambda: process_toggle(button, toggle_mode),
+            trigger="date",
+            run_date=datetime.now() + timedelta(seconds=delay),
+        )
+        return f"{button.name} was scheduled in {delay} seconds"
+    else:
+        return process_toggle(button, toggle_mode)
+
+
+def process_toggle(button, toggle_mode):
+    if button.mode == "wemo":
+        try:
+            url = pywemo.setup_url_for_address(button.address)
+            device = pywemo.device_from_description(url)
+            if toggle_mode == "on":
+                device.set_state(True)
+            elif toggle_mode == "off":
+                device.set_state(False)
+            else:
                 device.toggle()
-                return "on" if device.get_state() else "off"
+            return f"{button.name} was turned {'on' if device.get_state() else 'off'}"
 
-            except pywemo.PyWeMoException:
-                return "pywemo exception", 500
+        except pywemo.PyWeMoException:
+            return "pywemo exception", 500
 
-        elif button.mode == "gpio":
-            try:
-                button.connection.off()
-                sleep(button.meta.get("wait", 1))
-                button.connection.on()
-                return "success"
+    elif button.mode == "gpio":
+        try:
+            button.meta.connection.off()
+            sleep(button.meta.get("wait", 1))
+            button.meta.connection.on()
+            return f"{button.name} was toggled"
 
-            except GPIOZeroError:
-                return "gpio exception", 500
+        except GPIOZeroError:
+            return "gpio exception", 500
 
-    return "not found", 404
+    return f"{button.name}'s mode is unsupported", 500
 
 
 if __name__ == "__main__":
