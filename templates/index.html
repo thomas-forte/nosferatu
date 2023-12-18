@@ -1,36 +1,20 @@
 {% extends "base.html" %}
 
-{% block pageTitle %}{{ pageTitle }}{% endblock %}
+{% block pageTitle %}{{ site.title or "Nosferatu" }}{% endblock %}
 
 {%block page %}
 <div class="container d-flex flex-wrap justify-content-center">
-  {% for wemo in wemos %}
+  {% for button in buttons %}
   <button
-    id="wemo-{{ wemo.key }}-button"
+    id="{{ button.key }}"
     class="btn btn-primary btn-block btn-lg px-4 m-3"
     type="button"
     style="min-width: 180px;"
-    data-key="{{ wemo.key }}"
-    data-name="{{ wemo.name }}"
+    data-key="{{ button.key }}"
+    data-mode="{{ button.mode }}"
+    data-name="{{ button.name }}"
   >
-    {{ wemo.name }}
-  </button>
-  {% else %}
-  <p>See the <a href="https://github.com/thomas-forte/nosferatu/blob/master/README.md">README</a> for project config</p>
-  {% endfor %}
-</div>
-
-<div class="container d-flex flex-wrap justify-content-center">
-  {% for pin in pins %}
-  <button
-    id="pin-{{ pin.key }}-button"
-    class="btn btn-secondary btn-block btn-lg px-4 m-3"
-    type="button"
-    style="min-width: 180px;"
-    data-key="{{ pin.pin }}"
-    data-name="{{ pin.name }}"
-  >
-    {{ pin.name }}
+    {{ button.name }}
   </button>
   {% else %}
   <p>See the <a href="https://github.com/thomas-forte/nosferatu/blob/master/README.md">README</a> for project config</p>
@@ -66,17 +50,10 @@
   for (const button of buttons) {
     button.addEventListener('click', async e => {
       e.preventDefault();
-      if (button.id.includes('wemo')) {
-        await fetch(`/wemo/${button.dataset.key}`)
-          .then(response => response.text())
-          .then(text => addAlert(`${button.dataset.name} turned ${text}`))
-          .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
-      } else {
-        await fetch(`/gpio/${button.dataset.key}`)
-          .then(response => response.text())
-          .then(text => addAlert(`${button.dataset.name} turned ${text}`))
-          .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
-      }
+      await fetch(`/toggle/${button.dataset.key}`)
+        .then(response => response.text())
+        .then(text => addAlert(`${button.dataset.name} turned ${text}`))
+        .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
       e.target.blur();
     });
   }

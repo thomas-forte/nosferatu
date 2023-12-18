@@ -1,88 +1,84 @@
-import json
 from time import sleep
 from flask import Flask, render_template
-from gpiozero import LED
+from gpiozero import LED, GPIOZeroError, Device
 import pywemo
 
+from config import CONFIG
+from button import Buttons
+
 app = Flask(__name__)
+buttons = Buttons()
 
-with open('config.json', encoding='utf-8') as f:
-    config = json.load(f)
+# setup wemo buttons
+for wemo_config in CONFIG.get("wemos", []):
+    buttons.add_button(mode="wemo", **wemo_config, example="test")
 
-pins = []
-for gpio in config.get('gpios', []):
-    pins.append({
-        'pin': gpio['pin'],
-        'key': gpio['key'],
-        'name': gpio['name'],
-        'wait': gpio['wait'],
-        'connector': LED(gpio['pin'], initial_value=True)
-    })
+# setup gpio buttons
+try:
+    Device()  # forces to check if pin factory exists
 
-wemos = []
-for wemo_config in config.get('wemos', []):
-    wemos.append({
-        'ip': wemo_config['ip'],
-        'key': wemo_config['key'],
-        'name': wemo_config['name']
-    })
+    for gpio_config in CONFIG.get("gpios", []):
+        buttons.add_button(
+            mode="gpio",
+            **gpio_config,
+            connection=LED(gpio_config["address"], initial_value=True),
+        )
+except GPIOZeroError:
+    print("Issue setting up gpio, skipping config.")
 
 
-@app.route('/', methods=['GET'])
+@app.route("/", methods=["GET"])
 def index():
     """
-        Le index
+    Le index
     """
     return render_template(
-        'index.html',
-        pageTitle=config['title'],
-        pageSubtitle=config['subtitle'],
-        pageIcon=config['icon'],
-        pins=pins,
-        wemos=wemos)
+        "index.html",
+        site=CONFIG.get("site"),
+        buttons=buttons.values(),
+    )
 
 
-@app.route('/privacy', methods=['GET'])
+@app.route("/privacy", methods=["GET"])
 def privacy():
     """
-        Privacy concerns
+    Privacy concerns
     """
     return render_template(
-        'privacy.html',
-        pageTitle=config['title'],
-        pageSubtitle='Privacy',
-        pageIcon=config['icon'])
+        "privacy.html",
+        site=CONFIG.get("site", {}) | {"subtitle": "Privacy"},
+    )
 
 
-@app.route('/gpio/<int:pin>', methods=['GET'])
-def gpio_toggle(pin):
+@app.route("/toggle/<uuid:key>", methods=["GET"])
+def toggle(key):
     """
-        "Ajax"
+    "Ajax"
     """
-    pin = [x for x in pins if x['pin'] == pin]
-    if len(pin) != 1:
-        return 'error', 500
-    pin = pin[0]
-    pin['connector'].off()
-    sleep(pin['wait'])
-    pin['connector'].on()
-    return 'success'
+    button = buttons.get(key)
+    if button:
+        if button.mode == "wemo":
+            try:
+                url = pywemo.setup_url_for_address(button.address)
+                device = pywemo.device_from_description(url)
+                device.toggle()
+                return "on" if device.get_state() else "off"
 
+            except pywemo.PyWeMoException:
+                return "pywemo exception", 500
 
-@app.route('/wemo/<string:key>', methods=['GET'])
-def wemo_toggle(key):
-    """
-        "Ajax"
-    """
-    wemo = [x for x in wemos if x['key'] == key]
-    if len(wemo) != 1:
-        return 'error', 500
-    wemo = wemo[0]
-    url = pywemo.setup_url_for_address(wemo['ip'])
-    device = pywemo.device_from_description(url)
-    device.toggle()
-    return 'on' if device.get_state() else 'off'
+        elif button.mode == "gpio":
+            try:
+                button.connection.off()
+                sleep(button.meta.get("wait", 1))
+                button.connection.on()
+                return "success"
+
+            except GPIOZeroError:
+                return "gpio exception", 500
+
+    return "not found", 404
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host="0.0.0.0", port=8000)
