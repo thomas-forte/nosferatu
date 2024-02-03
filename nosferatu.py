@@ -4,37 +4,50 @@ from uuid import uuid4
 
 from flask import Flask, render_template, request
 from flask_apscheduler import APScheduler
+from flask_caching import Cache
 from gpiozero import LED, GPIOZeroError, Device
 import pywemo
 
 from config import CONFIG
 from button import Buttons
 
+
 app = Flask(__name__)
-buttons = Buttons()
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
+cache = Cache(config={"CACHE_TYPE": "FileSystemCache"})
+cache.init_app(app)
 
-# setup wemo buttons
-for wemo_config in CONFIG.get("wemos", []):
-    buttons.add_button(mode="wemo", **wemo_config, example="test")
 
-# setup gpio buttons
-try:
-    Device()  # forces to check if pin factory exists
+def setup(cache):
+    """
+    App Setup
+    """
+    buttons = Buttons()
 
-    for gpio_config in CONFIG.get("gpios", []):
-        buttons.add_button(
-            mode="gpio",
-            **gpio_config,
-            connection=LED(gpio_config["address"], initial_value=True),
-        )
-except GPIOZeroError:
-    print("Issue setting up gpio, skipping config.")
+    # setup wemo buttons
+    for wemo_config in CONFIG.get("wemos", []):
+        buttons.add_button(mode="wemo", **wemo_config, example="test")
+
+    # setup gpio buttons
+    try:
+        Device()  # forces to check if pin factory exists
+
+        for gpio_config in CONFIG.get("gpios", []):
+            buttons.add_button(
+                mode="gpio",
+                **gpio_config,
+                connection=LED(gpio_config["address"], initial_value=True),
+            )
+    except GPIOZeroError:
+        print("Issue setting up gpio, skipping config.")
+
+    cache.set("buttons", buttons)
 
 
 @app.route("/", methods=["GET"])
+@cache.cached()
 def index():
     """
     Le index
@@ -42,11 +55,12 @@ def index():
     return render_template(
         "index.html",
         site=CONFIG.get("site"),
-        buttons=buttons.values(),
+        buttons=cache.get("buttons").values(),
     )
 
 
 @app.route("/privacy", methods=["GET"])
+@cache.cached()
 def privacy():
     """
     Privacy concerns
@@ -64,6 +78,7 @@ def toggle(key):
     """
     toggle_mode = request.args.get("mode", default="toggle")
     delay = request.args.get("delay", type=int)
+    buttons = cache.get("buttons")
     button = buttons.get(key)
     if not button:
         return "key was not found", 404
@@ -81,6 +96,9 @@ def toggle(key):
 
 
 def process_toggle(button, toggle_mode):
+    """
+    Tickler
+    """
     if button.mode == "wemo":
         try:
             url = pywemo.setup_url_for_address(button.address)
@@ -110,4 +128,5 @@ def process_toggle(button, toggle_mode):
 
 
 if __name__ == "__main__":
+    setup(cache)
     app.run(host="0.0.0.0", port=8000)
