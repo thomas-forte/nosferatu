@@ -29,6 +29,7 @@ def setup(cache):
     """
     App Setup
     """
+    print("app setup()")
     buttons = Buttons()
 
     # setup wemo buttons
@@ -48,6 +49,7 @@ def setup(cache):
     except GPIOZeroError:
         print("Issue setting up gpio, skipping config.")
 
+    print("cache setting buttons")
     cache.set("buttons", buttons)
 
 
