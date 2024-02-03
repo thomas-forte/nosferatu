@@ -16,7 +16,12 @@ app = Flask(__name__)
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
-cache = Cache(config={"CACHE_TYPE": "FileSystemCache"})
+cache = Cache(
+    config={
+        "CACHE_TYPE": "FileSystemCache",
+        "CACHE_DIR": "tmp",
+    }
+)
 cache.init_app(app)
 
 
