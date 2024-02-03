@@ -6,7 +6,7 @@ services:
 
     restart: unless-stopped
 
-    command: gunicorn -w 2 -b 0.0.0.0:8000 wsgi:app
+    command: gunicorn -w 1 -b 0.0.0.0:8000 wsgi:app
 
   nginx:
     image: nginx:alpine
