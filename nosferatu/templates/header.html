@@ -1,0 +1,13 @@
+<div class="px-4 pt-5 text-center">
+    {% if config["SITE_ICON"] %}
+    <i class="{{ config["SITE_ICON"] }} fa-6x mb-2"></i>
+    {% endif %}
+
+    <h1 class="display-5 fw-bold text-body-emphasis mb-0">{{ config["SITE_TITLE"] }}</h1>
+
+    {% if config["SITE_SUBTITLE"] %}
+    <div class="col-lg-6 mx-auto">
+        <p class="lead fst-italic">{{ config["SITE_SUBTITLE"] }}</p>
+    </div>
+    {% endif %}
+</div>

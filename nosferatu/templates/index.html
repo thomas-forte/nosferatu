@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{%block page %}
+<div class="container d-flex flex-wrap justify-content-center">
+  <div class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="col-12">
+      <label
+        class="visually-hidden"
+        for="mode"
+      >Mode</label>
+      <select
+        class="form-select"
+        id="mode"
+      >
+        <option
+          selected
+          value=""
+        >Toggle</option>
+        <option value="ON">On</option>
+        <option value="OFF">Off</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="scheduled"
+          change="e => console.log(e)"
+        >
+        <label
+          class="form-check-label"
+          for="scheduled"
+        >
+          Scheduled
+        </label>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <label
+        class="visually-hidden"
+        for="delay"
+      >Delay</label>
+      <div class="input-group">
+        <div class="input-group-text">Seconds</div>
+        <input
+          type="number"
+          step="1"
+          class="form-control"
+          id="delay"
+          placeholder="Delay"
+          min="5"
+          max="50000"
+        >
+      </div>
+    </div>
+
+    <div class="col-12">
+      <button
+        id="delayHour"
+        class="btn btn-block"
+        type="button"
+      >
+        Delay 1h
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container d-flex flex-wrap justify-content-center">
+  {% for wemo in config["WEMOS"] %}
+  <button
+    id="{{ wemo.key }}"
+    class="btn btn-primary btn-block btn-lg px-4 m-3"
+    type="button"
+    style="min-width: 180px;"
+    data-key="{{ wemo.key }}"
+    data-name="{{ wemo.name }}"
+  >
+    {{ wemo.name }}
+  </button>
+  {% else %}
+  <p>See the <a href="https://github.com/thomas-forte/nosferatu/blob/master/README.md">README</a> for project config</p>
+  {% endfor %}
+</div>
+
+<div
+  id="alerts"
+  class="fixed-top w-100 px-5 mt-5"
+>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script type="text/javascript">
+  const modeSelection = document.getElementById("mode");
+  const scheduledCheckbox = document.getElementById("scheduled");
+  const delayInput = document.getElementById("delay");
+  delayInput.disabled = true;
+  scheduledCheckbox.addEventListener('change', e => {
+    delayInput.disabled = !e.target.checked;
+    e.target.blur();
+  });
+
+  const delayHourButton = document.getElementById("delayHour");
+  delayHourButton.addEventListener('click', () => delayInput.value = 60 * 60);
+
+  const alertContainer = document.getElementById('alerts');
+
+  const addAlert = (message, style = "success") => {
+    const alertWrapper = document.createElement("div");
+    alertWrapper.innerHTML = [
+      `<div class="alert alert-${style} alert-dismissible d-flex align-items-center" role="alert">`,
+      `   <i class="${style === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle'} me-2"></i>`,
+      `   <div>${message}</div>`,
+      '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+      '</div>'
+    ].join('');
+    alertContainer.append(alertWrapper);
+    setTimeout(() => new bootstrap.Alert(alertWrapper.firstChild).close(), 3500);
+  }
+
+  document.querySelectorAll("button[data-key]").forEach(button => {
+    button.addEventListener('click', async e => {
+      e.preventDefault();
+      const url = new URL(`/toggle/${button.dataset.key}`, location.href);
+      if (modeSelection.value) {
+        url.searchParams.append("mode", modeSelection.value);
+      }
+      if (scheduledCheckbox.checked) {
+        url.searchParams.append("delay", delayInput.value);
+      }
+      await fetch(url)
+        .then(response => response.text())
+        .then(text => addAlert(text))
+        .catch(e => console.log(e))
+      // .catch(() => addAlert(`${button.dataset.name} cycling failed`, 'danger'))
+      e.target.blur();
+    });
+  })
+
+</script>
+{% endblock %}

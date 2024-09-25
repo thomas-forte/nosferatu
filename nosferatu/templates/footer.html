@@ -1,0 +1,51 @@
+<footer class="mt-auto row align-items-center p-3 border-top g-0">
+    <ul class="col-12 col-md-4 nav justify-content-center justify-content-md-start">
+        <li class="nav-item">
+            <a
+                href="/"
+                class="nav-link px-2 text-body-secondary"
+            >
+                Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a
+                href="/privacy"
+                class="nav-link px-2 text-body-secondary"
+            >
+                Privacy
+            </a>
+        </li>
+        <li class="nav-item">
+            <a
+                href="https://github.com/thomas-forte/nosferatu/issues"
+                class="nav-link px-2 text-body-secondary"
+            >
+                Support
+            </a>
+        </li>
+    </ul>
+
+    <div class="col-12 col-md-4 text-body-secondary text-center order-5 order-md-0">
+        By <a href="https://mund.us">Thomas Forte</a>
+    </div>
+
+    <div class="col-12 col-md-4 text-center text-md-end mb-2 mb-md-0">
+        {% if g.user %}
+        <a
+            href="{{ url_for('wemos.list') }}"
+            class="link-primary px-2"
+        >Wemos</a>
+        <a
+            href="{{ url_for('auth.logout') }}"
+            class="link-primary"
+        >Logout</a>
+        {% else %}
+        <a
+            href="{{ url_for('auth.login') }}"
+            class="link-primary px-2"
+        >Login</a>
+        {% endif %}
+    </div>
+
+</footer>
