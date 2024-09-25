@@ -1,10 +1,7 @@
 services:
   gunicorn:
     build: .
-
     restart: unless-stopped
-
-    command: gunicorn -w 1 -b 0.0.0.0:8000 wsgi:app
 
   nginx:
     image: nginx:alpine
@@ -17,7 +14,7 @@ services:
 
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/usr/src/app/static
+      - ./nosferatu/static:/usr/src/app/static
 
     networks:
       - default
