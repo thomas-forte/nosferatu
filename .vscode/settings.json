@@ -8,5 +8,8 @@
         "gpio",
         "wemo",
         "wemos"
-    ]
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    }
 }

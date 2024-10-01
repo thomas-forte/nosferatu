@@ -97,20 +97,20 @@ db.sqlite3-journal
 # Test code file
 __test__.py
 
-# VSCode file
-settings.json
-launch.json
+# IDEs
+.vscode/
+.idea/
 
 # Apple
 .DS_Store
 
-# Jetbrains
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/shelf/
-
 # Project
 boot/
 docs/
+.flake8
+.gitignore
+docker-compose.yml
+dockerfile
+nginx.conf
 nosferatu.service
 README.md
